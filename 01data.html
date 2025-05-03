@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>HTML</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      color: #fff;
+    }
+    body {
+      width: 100vw;
+      height: 100vh;
+      background: black;
+    }
+    img {
+      width: 100vw;
+      height: 500px;
+      margin: 10px 0;
+      object-fit: contain;
+    }
+  </style>
+</head>
+
+<body>
+  
+  <script>
+    fetch('https://api.github.com/repos/Shamaali86055/PicAl/contents')
+    .then(r => r.json())
+    .then(d => {
+      d.forEach(f => {
+        if (f.name.endsWith(".jpg")) {
+          let img = new Image();
+          img.src = f.download_url;
+          document.body.appendChild(img);
+        }
+      })
+    })
+  </script>
+</body>
+</html>

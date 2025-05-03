@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Multi Video BIN Viewer</title>
+</head>
+<body>
+  <h2>BIN File with Multiple Videos</h2>
+
+  <input type="file" id="binInput" accept=".bin">
+  <button onclick="loadVideosFromBIN()">Load Videos</button>
+
+  <div id="videoContainer"></div>
+
+  <script>
+    function loadVideosFromBIN() {
+      const input = document.getElementById('binInput');
+      const file = input.files[0];
+      if (!file) {
+        alert("Please select a .bin file.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const buffer = e.target.result;
+        const dataView = new DataView(buffer);
+        const decoder = new TextDecoder();
+
+        // Read header
+        const header = decoder.decode(buffer.slice(0, 8));
+        if (header !== 'VIDBIN01') {
+          alert("Invalid BIN file.");
+          return;
+        }
+
+        // Read number of videos
+        const count = dataView.getUint32(8, true);
+        let offset = 12;
+        const container = document.getElementById('videoContainer');
+        container.innerHTML = ''; // Clear previous
+
+        for (let i = 0; i < count; i++) {
+          const size = dataView.getUint32(offset, true);
+          offset += 4;
+
+          const videoBytes = new Uint8Array(buffer, offset, size);
+          offset += size;
+
+          const blob = new Blob([videoBytes], { type: 'video/mp4' }); // Adjust MIME if needed
+          const url = URL.createObjectURL(blob);
+
+          const video = document.createElement('video');
+          video.src = url;
+          video.width = 300;
+          video.controls = true;
+          video.style.margin = '10px';
+          container.appendChild(video);
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+  </script>
+</body>
+</html>
